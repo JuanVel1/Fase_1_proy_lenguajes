@@ -36,6 +36,9 @@ class Gramatica:
     def actualizarProduccion(self, llave, valor):
         self._P[llave] = valor
 
+    def actualizarProduccion_nueva(self, llave, valor):
+        self._P[llave] = valor + '|λ'
+
     def eliminarRecursion(self):
         # A+ BIA' | BA'|... | BA'
         # A' → QA’ | Q2A' | ... | AmAla
@@ -43,43 +46,54 @@ class Gramatica:
         terminos_independientes = []
         terminos_asociativos = []
         llave_prima = ''
+        producciones_nuevas = []
+        termino_aparte = ''
 
         for llave, valor in self._P.items():
+            terminos_asociativos.clear()
+            terminos_independientes.clear()
             hay_recursion = False
+
             if valor.count("|") > 0:  # Si contiene el separador  |
                 valores = valor.split("|")  # Se obtiene cada conjunto
-                terminos_asociativos.clear()
-                terminos_independientes.clear()
                 for val in valores:
                     if val.startswith(llave):
                         print("Se encontro recursion : ", llave, " --> ", val)
-                        terminos_asociativos.append(val.removeprefix(llave))
+                        terminos_asociativos.append(val.removeprefix(llave) + llave + '\'')
                         hay_recursion = True
                     else:
-                        terminos_independientes.append(val)
+                        terminos_independientes.append(val + llave + '\'')
 
-            print("Terminos asociativos: ")
-            for ta in terminos_asociativos:
                 if hay_recursion:
-                    ta += llave + '\''
-                print(ta)
-
-            print("Terminos independientes: ")
-            for ti in terminos_independientes:
-                if hay_recursion:
-                    ti += llave + '\''
-                print(ti)
+                    if len(terminos_independientes) > 0:
+                        terminos = ''
+                        for termino in terminos_independientes:
+                            terminos += termino + '|'
+                        terminos = terminos.removesuffix('|')
+                        self.actualizarProduccion(llave, terminos)
+                    if len(terminos_asociativos) > 0:
+                        terminos = ''
+                        for termino in terminos_asociativos:
+                            terminos += termino + '|'
+                        terminos = terminos.removesuffix('|')
+                        producciones_nuevas.append((
+                            llave + '\'', terminos
+                        ))
 
             else:
                 if valor.startswith(llave):
                     print("Se encontro recursion : ", llave, " --> ", valor)
                     llave_prima = llave + '\''
+                    hay_recursion = True
+                    termino_aparte = valor.removeprefix(llave)
+                if hay_recursion:
+                    self.actualizarProduccion(llave, llave_prima)
+                    producciones_nuevas.append((
+                        llave + '\'', termino_aparte + llave + '\''
+                    ))
 
-            if hay_recursion:
-                self.actualizarProduccion(llave, terminos_independientes)
-
-            print("--------------------------------------")
-        """
-        self.actualizarProduccion(llave, aux1)
-        self.actualizarProduccion(llave + '\'', aux2)
-        """
+        if len(producciones_nuevas) > 0:
+            for pn in producciones_nuevas:
+                self.actualizarProduccion_nueva(pn[0], pn[1])
+            print("****")
+        print("--------------------------------------")

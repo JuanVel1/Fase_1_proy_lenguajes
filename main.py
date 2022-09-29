@@ -16,3 +16,8 @@ if __name__ == '__main__':
     print("---------------------------------------------------------------------------------")
     gramatica.eliminarRecursion()
     print("Producciones: ", gramatica.getP())
+
+    ## Paso 2, sacar primeros
+    print("---------------------------------------------------------------------------------")
+    gramatica.getPrimeros()
+

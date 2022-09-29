@@ -11,9 +11,9 @@
     ],
     "S": "aB",
     "P": {
-      "S": "SB|bA",
+      "S": "aB|bA",
       "A": "a|aS|bAA",
-      "B": "B|bS|aBB"
+      "B": "b|bS|aBB"
     }
   }
 }
