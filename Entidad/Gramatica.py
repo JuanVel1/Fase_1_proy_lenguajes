@@ -97,3 +97,41 @@ class Gramatica:
                 self.actualizarProduccion_nueva(pn[0], pn[1])
             print("****")
         print("--------------------------------------")
+
+    """
+    Formula general
+    X→ y1,y2,y3.....yk
+    y1...→ VT 6 VN
+    prim(x) → si y1 es terminal, entonces agregar y1 a prim(x)
+              si y1 no es terminal, entonces agregar prim(yl) a prim(x)
+              si y1 es , entonces agregar prim(y2) a prim(x)
+              si y1 hasta yk tiene 1, entonces agregar a prim(x)
+    """
+
+    def getPrimeros(self):
+        print("Generando primeros...")
+
+        # Recorremos cada produccion
+        for llave, valor in self._P.items():
+            print('Primeros de ', llave, '--> prim(', llave, ') = ')
+            # Recorremos cada termino
+            if valor.count("|") > 0:
+                valores = valor.split("|")  # Se obtiene cada conjunto
+                for termino in valores:
+                    if termino[0] in self._Vn:
+                        # si y1 no es terminal, entonces agregar prim(yl) a prim(x)
+                        pass
+                    elif termino[0] in self._Vt:
+                        pass
+                pass
+            else:
+                pass
+
+    def getSiguientes(self):
+        # Crear codigo para generar los siguientes de cada produccion
+        """
+        # Producciones
+        self._P = {} --> Conjunto de producciones con llave no terminal y valores correspondientes a sus producciones
+        separadas por  |
+        """
+        pass
