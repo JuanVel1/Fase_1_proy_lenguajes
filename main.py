@@ -16,11 +16,12 @@ if __name__ == '__main__':
     print("---------------------------------------------------------------------------------")
     gramatica.eliminarRecursion()
     print("Producciones: ", gramatica.getP())
+    print("No terminales: ", gramatica.getVn())
+    print("Terminales: ", gramatica.getVt())
 
     ## Paso 2, sacar primeros
     print("---------------------------------------------------------------------------------")
     gramatica.getPrimeros()
-
 
 """
 def crearTabla():

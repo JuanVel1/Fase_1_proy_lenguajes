@@ -7,13 +7,15 @@
     "Vn": [
       "S",
       "A",
-      "B"
+      "B",
+      "C"
     ],
     "S": "aB",
     "P": {
       "S": "aB|bA",
-      "A": "a|aS|bAA",
-      "B": "b|bS|aBB"
+      "A": "B|aS|bAA",
+      "B": "b|bS|aBB",
+      "C": "b"
     }
   }
 }

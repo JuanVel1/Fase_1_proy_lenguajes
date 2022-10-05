@@ -1,13 +1,13 @@
 class Gramatica:
-    def __init__(self):
+    def __init__(self, Vt, Vn, S, P):
         # Terminales
-        self._Vt = []
+        self._Vt = Vt
         # No terminales
-        self._Vn = []
+        self._Vn = Vn
         # Simbolo inicial
-        self._S = ''
+        self._S = S
         # Producciones
-        self._P = {}
+        self._P = P
 
     def setVt(self, vt):
         self._Vt = vt
@@ -112,20 +112,85 @@ class Gramatica:
         print("Generando primeros...")
 
         # Recorremos cada produccion
+        print(self._P.items())
         for llave, valor in self._P.items():
-            print('Primeros de ', llave, '--> prim(', llave, ') = ')
+            primeros = []
             # Recorremos cada termino
             if valor.count("|") > 0:
-                valores = valor.split("|")  # Se obtiene cada conjunto
+                valores = valor.split("|")
+                # Se obtiene cada conjunto
+                print("Valores : ", valores)
+                print("No terminales : ", self._Vt)
                 for termino in valores:
                     if termino[0] in self._Vn:
+                        print(termino[0], "Es no terminal !")
+                        primeros = self.primeroXTermino(termino[0])
                         # si y1 no es terminal, entonces agregar prim(yl) a prim(x)
-                        pass
                     elif termino[0] in self._Vt:
-                        pass
-                pass
+                        print(termino[0], "Es terminal !")
+                        if termino[0] not in primeros:
+                            primeros.append(termino[0])
+
             else:
-                pass
+                if valor in self._Vn:
+                    print(valor, "Es no terminal !")
+                    primeros = self.primeroXTermino(valor)
+                    # si y1 no es terminal, entonces agregar prim(yl) a prim(x)
+                elif valor in self._Vt:
+                    print(valor, "Es terminal !")
+                    if valor not in primeros:
+                        primeros.append(valor)
+
+            print('Primeros de ', llave, '--> prim(', llave, ') = ', primeros)
+
+    def primeroXTermino(self, termino):
+        # Ingrese un termino no terminal hasta que me devuelva un terminal
+        # Recorremos las producciones para  buscar la que empieza con el termino, la coincidencia
+        # {'S': 'aB|bA', 'A': 'B|aS|bAA', 'B': 'b|bS|aBB'}
+        primeros = []
+        for no_terminal, terminos in self._P.items():
+            if no_terminal == termino:
+                for termino in terminos:
+                    if termino[0] in self._Vt:
+                        primeros.append(termino[0])
+                    else:
+                        primeros = self.primeroXTermino(termino[0])
+                        return primeros
+        return primeros
+
+    """
+
+
+	if len(regla) != 0:
+		if regla[0] in list(gramatica.keys()):
+			lista = []
+			der_reglas = gramatica[regla[0]]
+			for itr in der_reglas:
+				indivRes = primero(itr)
+				if type(indivRes) is list:
+					for i in indivRes:
+						lista.append(i)
+				else:
+					lista.append(indivRes)
+
+			if '#' not in lista:
+				return lista
+			else:
+				nuevaLista = []
+				lista.remove('#')
+				if len(regla) > 1:
+					nuevaRes = primero(regla[1:])
+					if nuevaRes != None:
+						if type(nuevaRes) is list:
+							nuevaLista = lista + nuevaRes
+						else:
+							nuevaLista = lista + [nuevaRes]
+					else:
+						nuevaLista = lista
+					return nuevaLista
+				lista.append('#')
+				return lista
+    """
 
     def getSiguientes(self):
         # Crear codigo para generar los siguientes de cada produccion

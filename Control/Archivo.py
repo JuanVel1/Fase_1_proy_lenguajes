@@ -31,21 +31,20 @@ class Archivo:
                 print("---------------------------------------------------------------------------------")
 
     def asignarGramatica(self):
-        grm = Gramatica.Gramatica()
-        aux = []
+        terminales = []
+        noTerminales = []
+        inicial = ''
+        Producciones = {}
         for item in self.datos['G1']:
             if item == 'Vt':
                 for terminal in self.datos['G1']['Vt']:
-                    aux.append(terminal)
-                grm.setVt(aux)
+                    terminales.append(terminal)
             elif item == 'Vn':
-                aux.clear()
                 for no_terminal in self.datos['G1']['Vn']:
-                    aux.append(no_terminal)
-                grm.setVn(aux)
+                    noTerminales.append(no_terminal)
             elif item == 'S':
-                grm.setS(self.datos['G1']['S'])
+                inicial = self.datos['G1']['S']
             elif item == 'P':
-                aux.clear()
-                grm.setP(self.datos['G1']['P'])
+                Producciones = self.datos['G1']['P']
+        grm = Gramatica.Gramatica(terminales, noTerminales, inicial, Producciones)
         return grm
