@@ -6,13 +6,14 @@ from builtins import print
 
 class Archivo:
     def __init__(self):
-        self.archivo_json = open('src/Ejemplo_2_Gramatica.json')
+        self.archivo_json = open('src/Ejemplo_3_Gramatica.json')
         self.datos = json.load(self.archivo_json)
 
     def getDatos(self):
         return self.datos
 
     def imprimirJson(self):
+
         for item in self.datos['G1']:
             if item == 'Vt':
                 for terminal in self.datos['G1']['Vt']:
@@ -27,6 +28,8 @@ class Archivo:
                 print("---------------------------------------------------------------------------------")
             elif item == 'P':
                 for clave, valor in self.datos['G1']['P'].items():
+                    clave = clave.replace('â€™', '\'')
+                    valor = valor.replace('Î»', 'λ')
                     print('Produccion ', clave, ' produce --> ', valor)
                 print("---------------------------------------------------------------------------------")
 
@@ -45,6 +48,11 @@ class Archivo:
             elif item == 'S':
                 inicial = self.datos['G1']['S']
             elif item == 'P':
-                Producciones = self.datos['G1']['P']
+                aux = {}
+                for clave, valor in self.datos['G1']['P'].items():
+                    clave = clave.replace('â€™', '\'')
+                    valor = valor.replace('Î»', 'λ')
+                    aux[clave] = valor
+                Producciones = aux
         grm = Gramatica.Gramatica(terminales, noTerminales, inicial, Producciones)
         return grm

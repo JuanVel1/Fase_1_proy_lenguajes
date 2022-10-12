@@ -118,10 +118,21 @@ class Gramatica:
             # Recorremos cada termino
             if valor.count("|") > 0:
                 valores = valor.split("|")
+
                 # Se obtiene cada conjunto
                 print("Valores : ", valores)
                 print("No terminales : ", self._Vt)
                 for termino in valores:
+                    print("Termino que se esta evaluando : ", termino[0])
+
+                    if termino in self._Vt:
+                        print(termino, "Es terminal !")
+                        primeros.append(termino)
+
+                    elif termino in self._Vn:
+                        print(termino, "Es no terminal !")
+                        primeros.append(self.primeroXTermino(termino, primeros))
+
                     if termino[0] in self._Vn:
                         print(termino[0], "Es no terminal !")
                         primeros = self.primeroXTermino(termino[0])
@@ -130,73 +141,210 @@ class Gramatica:
                         print(termino[0], "Es terminal !")
                         if termino[0] not in primeros:
                             primeros.append(termino[0])
+                    elif termino[0] == 'λ':
+                        print(termino[0], 'Encontramos un lambda')
+                        if len(termino) == 1:
+                            primeros.append(termino[0])
+                        else:
+                            primeros.append(self.primeroXTermino(termino[1]))
+
 
             else:
-                if valor in self._Vn:
-                    print(valor, "Es no terminal !")
-                    primeros = self.primeroXTermino(valor)
-                    # si y1 no es terminal, entonces agregar prim(yl) a prim(x)
-                elif valor in self._Vt:
+                print("Termino que se esta evaluando : ", valor[0])
+
+                if valor in self._Vt:
                     print(valor, "Es terminal !")
+                    primeros.append(valor)
+
+                elif valor in self._Vn:
+                    print(valor, "Es no terminal !")
+                    primeros.append(self.primeroXTermino(valor, primeros))
+
+                if valor[0] in self._Vn:
+                    print(valor[0], "Es no terminal !")
+                    primeros = self.primeroXTermino(valor[0], [])
+                    # si y1 no es terminal, entonces agregar prim(yl) a prim(x)
+                elif valor[0] in self._Vt:
+                    print(valor[0], "Es terminal !")
                     if valor not in primeros:
-                        primeros.append(valor)
-
+                        primeros.append(valor[0])
+                elif valor[0] == 'λ':
+                    print(valor[0], 'Encontramos un lambda')
+                    if len(valor) == 1:
+                        primeros.append(valor[0])
+                    else:
+                        primeros.append(self.primeroXTermino(valor[1]))
             print('Primeros de ', llave, '--> prim(', llave, ') = ', primeros)
+            print("-----------------------------")
 
-    def primeroXTermino(self, termino):
-        # Ingrese un termino no terminal hasta que me devuelva un terminal
+    def primeroXTermino(self, termino, primeros):
+        # Ingrese un termino no terminal hasta que me devuelva una lista con sus terminales
         # Recorremos las producciones para  buscar la que empieza con el termino, la coincidencia
         # {'S': 'aB|bA', 'A': 'B|aS|bAA', 'B': 'b|bS|aBB'}
-        primeros = []
+        # dict_items([('E', "TE'"), ("E'", "+TE'|λ"), ('T', "FT'"), ("T'", "*FT'|λ"), ('F', 'id|(E)')])
         for no_terminal, terminos in self._P.items():
             if no_terminal == termino:
-                for termino in terminos:
-                    if termino[0] in self._Vt:
-                        primeros.append(termino[0])
-                    else:
-                        primeros = self.primeroXTermino(termino[0])
-                        return primeros
+                # Recorremos sus terminos
+                if terminos.count("|") > 0:
+                    ter = terminos.split("|")
+                    for t in ter:
+                        print("Termino que se esta evaluando : ", t)
+                        print("Termino que se esta evaluando : ", t[0])
+
+                        if t in self._Vt:
+                            print(t, "Es terminal !")
+                            primeros.append(t)
+
+                        elif t in self._Vn:
+                            print(t, "Es no terminal !")
+                            primeros.append(self.primeroXTermino(t, primeros))
+
+                        elif t == 'λ':
+                            print('Encontramos un lambda')
+                            if len(t) == 1:
+                                primeros.append(t)
+
+                        if t[0] in self._Vt:
+                            print(t[0], "Es terminal !")
+                            primeros.append(t[0])
+
+                        elif t[0] in self._Vn:
+                            print(t[0], "Es no terminal !")
+                            primeros.append(self.primeroXTermino(t[0], primeros))
+
+                        elif t[0] == 'λ':
+                            print('Encontramos un lambda')
+                            if len(t) == 1:
+                                primeros.append(t[0])
+
+                else:
+                    print("Termino que se esta evaluando : ", terminos[0])
+
+                    if terminos[0] in self._Vt:
+                        print(terminos[0], "Es terminal !")
+                        primeros.append(terminos[0])
+                    elif terminos[0] in self._Vn:
+                        print(terminos[0], "Es no terminal !")
+                        self.primeroXTermino(terminos[0], primeros)
+                    elif terminos[0] == 'λ':
+                        print('Encontramos un lambda')
+
         return primeros
 
     """
-
-
-	if len(regla) != 0:
-		if regla[0] in list(gramatica.keys()):
-			lista = []
-			der_reglas = gramatica[regla[0]]
-			for itr in der_reglas:
-				indivRes = primero(itr)
-				if type(indivRes) is list:
-					for i in indivRes:
-						lista.append(i)
-				else:
-					lista.append(indivRes)
-
-			if '#' not in lista:
-				return lista
-			else:
-				nuevaLista = []
-				lista.remove('#')
-				if len(regla) > 1:
-					nuevaRes = primero(regla[1:])
-					if nuevaRes != None:
-						if type(nuevaRes) is list:
-							nuevaLista = lista + nuevaRes
-						else:
-							nuevaLista = lista + [nuevaRes]
-					else:
-						nuevaLista = lista
-					return nuevaLista
-				lista.append('#')
-				return lista
+    A --> αχβ
+    Sig(x) -->    
+    * si x es la producion inicial agregar $ a los Sig(x)
+    * si ß es terminal, entonces agregar B a Sig(x)
+    * si ß no es terminal entonces agregar a Sig(x) los prim(ß)
+    * si ß es λ, entonces agregar a Sig(x) los sig(A)
     """
 
     def getSiguientes(self):
-        # Crear codigo para generar los siguientes de cada produccion
+        print("Generando siguientes...")
+        print(self._P.items())
+        llaves = list(self._P.keys())
+        valores = list(self._P.values())
+
+        total_siguientes = {}
+        # Recorremos todas las producciones
+        for llave_x, valor_x in self._P.items():
+            siguientes = []
+            # Recorremos todos los valores de las producciones para buscar a llave
+            for llave_y, valor_y in self._P.items():
+                if llave_x in valor_y:
+                    division = valor_y.split(llave_x)
+                    caracter_posterior = division[len(division) - 1]
+
+                    # switch del caracter que encontro
+                    if caracter_posterior == " " or caracter_posterior == "":
+                        print("No hay nada despues de ", llave_x, " en ", valor_y)
+                        if llave_y in total_siguientes.keys():
+                            for i in total_siguientes[llave_y]:
+                                if i not in siguientes:
+                                    siguientes.append(i)
+                        else:
+                            siguientes.append(self.siguienteXTermino(llave_y, total_siguientes, []))
+                    elif caracter_posterior in self._Vt:
+                        if caracter_posterior not in siguientes:
+                            siguientes.append(caracter_posterior)
+                    # Si es no terminal
+                    elif caracter_posterior in self._Vn:
+                        simbolos_a_agregar = self.primeroXTermino(caracter_posterior, [])
+                        for s in simbolos_a_agregar:
+                            if s not in siguientes:
+                                siguientes.append(s)
+                    elif '\'' in division:
+                        continue
+                # Valida si la llave, valor es de la primer posicion
+            # if self._P.items().index((llave_x, valor_x)) == 0:
+
+            print("llaves :", llaves)
+            print("valores :", valores)
+            print(llave_x)
+            print(valor_x)
+            if llave_x == llaves[0] and valor_x == valores[0]:
+                siguientes.append('$')
+
+            print('Siguientes de ', llave_x, '--> sig(', llave_x, ') = ', siguientes)
+            total_siguientes[llave_x] = siguientes
+            print('------------------------------------------------------------------')
+
+    def siguienteXTermino(self, termino, total_siguientes, siguientes):
+        for llave_y, valor_y in self._P.items():
+            if termino in valor_y:
+                division = valor_y.split(termino)
+                caracter_posterior = division[len(division) - 1]
+                if caracter_posterior == " " or caracter_posterior == "":
+                    print("No hay nada despues de ", termino, " en ", valor_y)
+                    ######################################################implementar
+                    if llave_y in total_siguientes.keys():
+                        for i in total_siguientes[llave_y]:
+                            if i not in siguientes:
+                                siguientes.append(i)
+                    else:
+                        siguientes.append(self.siguienteXTermino(llave_y, total_siguientes, []))
+                elif caracter_posterior in self._Vt:
+                    if caracter_posterior not in siguientes:
+                        siguientes.append(caracter_posterior)
+                elif caracter_posterior in self._Vn:
+                    simbolos_a_agregar = self.primeroXTermino(caracter_posterior, [])
+                    for s in simbolos_a_agregar:
+                        if s not in siguientes:
+                            siguientes.append(s)
+                elif '\'' in division:
+                    continue
+        return siguientes
+
         """
-        # Producciones
-        self._P = {} --> Conjunto de producciones con llave no terminal y valores correspondientes a sus producciones
-        separadas por  |
+    
+        if len(regla) != 0:
+            if regla[0] in list(gramatica.keys()):
+                lista = []
+                der_reglas = gramatica[regla[0]]
+                for itr in der_reglas:
+                    indivRes = primero(itr)
+                    if type(indivRes) is list:
+                        for i in indivRes:
+                            lista.append(i)
+                    else:
+                        lista.append(indivRes)
+    
+                if '#' not in lista:
+                    return lista
+                else:
+                    nuevaLista = []
+                    lista.remove('#')
+                    if len(regla) > 1:
+                        nuevaRes = primero(regla[1:])
+                        if nuevaRes != None:
+                            if type(nuevaRes) is list:
+                                nuevaLista = lista + nuevaRes
+                            else:
+                                nuevaLista = lista + [nuevaRes]
+                        else:
+                            nuevaLista = lista
+                        return nuevaLista
+                    lista.append('#')
+                    return lista
         """
-        pass
