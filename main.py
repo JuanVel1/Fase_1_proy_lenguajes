@@ -21,7 +21,12 @@ if __name__ == '__main__':
 
     ## Paso 2, sacar primeros
     print("---------------------------------------------------------------------------------")
-    gramatica.getPrimeros()
+    #gramatica.getPrimeros()
+
+    ## Paso 3, sacar siguientes
+    print("---------------------------------------------------------------------------------")
+    gramatica.getSiguientes()
+
 
     ## Paso 3, sacar siguientes
     print("---------------------------------------------------------------------------------")
