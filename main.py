@@ -23,6 +23,10 @@ if __name__ == '__main__':
     print("---------------------------------------------------------------------------------")
     gramatica.getPrimeros()
 
+    ## Paso 3, sacar siguientes
+    print("---------------------------------------------------------------------------------")
+    # gramatica.getSiguientes()
+
 """
 def crearTabla():
 	import copy
