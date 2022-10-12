@@ -36,6 +36,7 @@ class Archivo:
     def asignarGramatica(self):
         terminales = []
         noTerminales = []
+
         inicial = ''
         Producciones = {}
         for item in self.datos['G1']:
