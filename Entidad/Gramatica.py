@@ -199,6 +199,7 @@ class Gramatica:
                             print(t, "Es no terminal !")
                             primeros.append(self.primeroXTermino(t, primeros))
 
+
                         elif t == 'λ' or t[0] == 'λ':
                             print('Encontramos un lambda')
                             simbolos_a_agregar = self.siguienteXTermino(no_terminal, total_siguientes, [])
