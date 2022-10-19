@@ -1,3 +1,6 @@
+from builtins import print
+
+
 class Gramatica:
     def __init__(self, Vt, Vn, S, P):
         # Terminales
@@ -8,6 +11,9 @@ class Gramatica:
         self._S = S
         # Producciones
         self._P = P
+        self._primeros = {}
+        self._siguientes = {}
+        self._isLL1 = False
 
     def setVt(self, vt):
         self._Vt = vt
@@ -33,11 +39,20 @@ class Gramatica:
     def getP(self):
         return self._P
 
+    def getPrimeros(self):
+        return self._primeros
+
+    def getSiguientes(self):
+        return self._siguientes
+
     def actualizarProduccion(self, llave, valor):
         self._P[llave] = valor
 
     def actualizarProduccion_nueva(self, llave, valor):
         self._P[llave] = valor + '|λ'
+
+    def setLL1(self, isLL1):
+        self._isLL1 = isLL1
 
     def eliminarRecursion(self):
         # A+ BIA' | BA'|... | BA'
@@ -108,9 +123,9 @@ class Gramatica:
               si y1 hasta yk tiene 1, entonces agregar a prim(x)
     """
 
-    def getPrimeros(self):
+    def generarPrimeros(self):
         print("Generando primeros...")
-
+        primerosTotales = {}
         # Recorremos cada produccion
         print(self._P.items())
         for llave, valor in self._P.items():
@@ -147,8 +162,6 @@ class Gramatica:
                             primeros.append(termino[0])
                         else:
                             primeros.append(self.primeroXTermino(termino[1]))
-
-
             else:
                 print("Termino que se esta evaluando : ", valor[0])
 
@@ -176,6 +189,8 @@ class Gramatica:
                         primeros.append(self.primeroXTermino(valor[1]))
             print('Primeros de ', llave, '--> prim(', llave, ') = ', primeros)
             print("-----------------------------")
+            primerosTotales[llave] = primeros
+        self._primeros = primerosTotales
 
     def primeroXTermino(self, termino, primeros, total_siguientes):
         # Ingrese un termino no terminal hasta que me devuelva una lista con sus terminales
@@ -225,7 +240,8 @@ class Gramatica:
                         self.primeroXTermino(terminos[0], primeros, {})
                     elif terminos[0] == 'λ':
                         print('Encontramos un lambda')
-
+            elif termino in self.getVt():
+                return termino
         return primeros
 
     """
@@ -237,7 +253,7 @@ class Gramatica:
     * si ß es λ, entonces agregar a Sig(x) los sig(A)
     """
 
-    def getSiguientes(self):
+    def generarSiguientes(self):
         print("Generando siguientes...")
         print(self._P.items())
         llaves = list(self._P.keys())
@@ -286,6 +302,7 @@ class Gramatica:
             print('Siguientes de ', llave_x, '--> sig(', llave_x, ') = ', siguientes)
             total_siguientes[llave_x] = siguientes
             print('------------------------------------------------------------------')
+        self._siguientes = total_siguientes
 
     def siguienteXTermino(self, termino, total_siguientes, siguientes):
         for llave_y, valor_y in self._P.items():
@@ -345,3 +362,45 @@ class Gramatica:
                     lista.append('#')
                     return lista
         """
+
+    def conjuntoPrediccion(self):
+        print("Generando conjunto prediccion...")
+        """Si todos dan 0 nos encontramos ante un conjunto de producciones que pertenecen a la gramatica LL1"""
+        # Primero debemos tener los conjuntos de primeros y siguientes para aplicar la formular
+        producciones = list(self.getP().keys())
+        conjunto_prediccion = []
+
+        for produccion, terminos in self.getP().items():
+            if terminos.count("|") > 0:  # Si ese no terminal aparece mas de una vez vale la pena validarlo
+                valores = terminos.split("|")
+                primeros = []
+                repetidos = 0
+                # print(valores)
+                for v in valores:
+                    primero = self.primeroXTermino(v[0], [], {})
+
+                    if primero:
+                        if type(primero) == list:
+                            for p in primero:
+                                conjunto_prediccion.append(p)
+                                if p in primeros:
+                                    repetidos = 1
+                                primeros.append(p)
+                        else:
+                            conjunto_prediccion.append(primero)
+                            if primero in primeros:
+                                repetidos = 1
+                            primeros.append(primero)
+
+                conjunto_prediccion.append([primeros])
+                # print(primeros)
+        print(conjunto_prediccion)
+        if repetidos:
+            print("NO nos encontramos ante un conjunto de producciones que pertenecen a la gramatica LL1")
+        else:
+            print("Nos encontramos ante un conjunto de producciones que pertenecen a la gramatica LL1")
+            self.setLL1(True)
+        print('--------------------------------------------------------------')
+
+    def generarTabla(self):
+        pass

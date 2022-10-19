@@ -21,16 +21,15 @@ if __name__ == '__main__':
 
     ## Paso 2, sacar primeros
     print("---------------------------------------------------------------------------------")
-    #gramatica.getPrimeros()
+    gramatica.generarPrimeros()
 
     ## Paso 3, sacar siguientes
     print("---------------------------------------------------------------------------------")
-    gramatica.getSiguientes()
+    gramatica.generarSiguientes()
 
-
-    ## Paso 3, sacar siguientes
+    ## Paso 4, sacar conjunto Prediccion
     print("---------------------------------------------------------------------------------")
-    # gramatica.getSiguientes()
+    gramatica.conjuntoPrediccion()
 
 """
 def crearTabla():

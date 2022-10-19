@@ -27,6 +27,7 @@ class Archivo:
                 print('Simbolo inicial ', self.datos['G1']['S'])
                 print("---------------------------------------------------------------------------------")
             elif item == 'P':
+                print(self.datos['G1']['P'].items())
                 for clave, valor in self.datos['G1']['P'].items():
                     clave = clave.replace('â€™', '\'')
                     valor = valor.replace('Î»', 'λ')

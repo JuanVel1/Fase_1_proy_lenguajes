@@ -48,9 +48,4 @@ for termino in dic:
 """
 ##################################################################################################
 
-algo = "Juanito"
-
-posicion = algo.index('n')
-print(posicion)
-
-print(algo[posicion + 1])
+algo = [1, 2, 5, 4, 5]
