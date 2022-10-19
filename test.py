@@ -32,7 +32,6 @@ imprimirJson()
 """
 
 ##################################################################################################
-from setuptools.command.alias import alias
 
 """dic = [('E', "TE'"), ("E'", "+TE'|λ|"), ('T', "FT'"), ("T'", "*FT'|λ"), ('F', 'id|(E)')]
 
@@ -48,4 +47,22 @@ for termino in dic:
 """
 ##################################################################################################
 
-algo = [1, 2, 5, 4, 5]
+tabla = []
+tabla = [[0 for i in range(6)] for j in range(6)]
+tabla[0][0] = "VT / VN"
+
+for columna in range(1, len(tabla[0]), 1):
+    tabla[0][columna] = 1
+
+for columna in range(1, len(tabla), 1):
+    tabla[columna][0] = 2
+
+for fila in tabla:
+    print(fila)
+
+contador = 0
+for x in range(1, len(tabla)):
+    for y in range(1, len(tabla[x])):
+        print(tabla[x][y])
+        print(contador)
+        contador += 1

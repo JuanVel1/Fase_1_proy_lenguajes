@@ -1,4 +1,5 @@
 from builtins import print
+from openpyxl import Workbook, load_workbook
 
 
 class Gramatica:
@@ -14,6 +15,8 @@ class Gramatica:
         self._primeros = {}
         self._siguientes = {}
         self._isLL1 = False
+        self._conjuntoP = []
+        self._tabla = []
 
     def setVt(self, vt):
         self._Vt = vt
@@ -38,6 +41,12 @@ class Gramatica:
 
     def getP(self):
         return self._P
+
+    def getTabla(self):
+        return self._tabla
+
+    def getConjuntoP(self):
+        return self._conjuntoP
 
     def getPrimeros(self):
         return self._primeros
@@ -212,7 +221,7 @@ class Gramatica:
 
                         elif t in self._Vn:
                             print(t, "Es no terminal !")
-                            primeros.append(self.primeroXTermino(t, primeros))
+                            primeros.append(self.primeroXTermino(t, primeros, total_siguientes))
 
 
                         elif t == 'λ' or t[0] == 'λ':
@@ -227,7 +236,7 @@ class Gramatica:
 
                         elif t[0] in self._Vn:
                             print(t[0], "Es no terminal !")
-                            primeros.append(self.primeroXTermino(t[0], primeros))
+                            primeros.append(self.primeroXTermino(t[0], primeros, total_siguientes))
 
                 else:
                     print("Termino que se esta evaluando : ", terminos[0])
@@ -237,9 +246,13 @@ class Gramatica:
                         primeros.append(terminos[0])
                     elif terminos[0] in self._Vn:
                         print(terminos[0], "Es no terminal !")
-                        self.primeroXTermino(terminos[0], primeros, {})
+                        self.primeroXTermino(terminos[0], primeros, total_siguientes)
                     elif terminos[0] == 'λ':
                         print('Encontramos un lambda')
+                        simbolos_a_agregar = self.siguienteXTermino(no_terminal, total_siguientes, [])
+                        for s in simbolos_a_agregar:
+                            if s not in primeros:
+                                primeros.append(s)
             elif termino in self.getVt():
                 return termino
         return primeros
@@ -371,30 +384,38 @@ class Gramatica:
         conjunto_prediccion = []
 
         for produccion, terminos in self.getP().items():
-            if terminos.count("|") > 0:  # Si ese no terminal aparece mas de una vez vale la pena validarlo
-                valores = terminos.split("|")
-                primeros = []
-                repetidos = 0
-                # print(valores)
-                for v in valores:
-                    primero = self.primeroXTermino(v[0], [], {})
+            valores = terminos.split("|")
 
+            repetidos = 0
+            # print(valores)
+            for v in valores:
+                primeros = []
+                if v != "":
+                    primero = self.primeroXTermino(v[0], [], self.getSiguientes())
+                    if not primero:
+                        primero = self.primeroXTermino(v, [], self.getSiguientes())
                     if primero:
                         if type(primero) == list:
                             for p in primero:
-                                conjunto_prediccion.append(p)
                                 if p in primeros:
                                     repetidos = 1
                                 primeros.append(p)
                         else:
-                            conjunto_prediccion.append(primero)
                             if primero in primeros:
                                 repetidos = 1
                             primeros.append(primero)
+                if v == 'λ':
+                    simbolos_a_agregar = self.siguienteXTermino(produccion, self.getSiguientes(), [])
+                    for s in simbolos_a_agregar:
+                        if s not in primeros:
+                            primeros.append(s)
+                print("conjunto prediccion de ", produccion, " --> ", v, primeros)
+                conjunto_prediccion.append((produccion, primeros))
 
-                conjunto_prediccion.append([primeros])
-                # print(primeros)
-        print(conjunto_prediccion)
+        for conjunto in conjunto_prediccion:
+            print(conjunto)
+        print('--------------------------------------------------------------')
+        self._conjuntoP = conjunto_prediccion
         if repetidos:
             print("NO nos encontramos ante un conjunto de producciones que pertenecen a la gramatica LL1")
         else:
@@ -402,5 +423,63 @@ class Gramatica:
             self.setLL1(True)
         print('--------------------------------------------------------------')
 
+    def guardarTabla(self):
+        print("Guardando tabla...")
+        wb = Workbook()
+        ws = wb.active
+
+        wb.save('src/TABLA ANALISIS SINTACTICO.xlsx')
+
+    """
+    Se llena la tabla mirando el conjunto prediccion 
+    se busca la fila donde este el que produce y en cada union
+    con cada columna donde este cada elemento de este conjunto se coloca
+    la produccion total
+    ej. E --> TE', tiene conjunto prediccion {id, (}
+    Entonces en la fila [E, id] Se coloca  E --> TE' y en 
+    la fila [E, (] tambien Se coloca  E --> TE'        
+    """
+
     def generarTabla(self):
-        pass
+        print("Generando tabla...")
+        columnas = []  # terminales
+        filas = []  # No terminales
+
+        for no_terminal, produccion in self.getConjuntoP():
+            for termino in produccion:
+                if termino not in columnas:
+                    columnas.append(termino)
+            if no_terminal not in filas:
+                filas.append(no_terminal)
+
+        tabla = [[0 for i in range(len(filas) + 2)] for j in range(len(columnas) + 1)]
+        tabla[0][0] = "VT / VN"
+
+        for fila in tabla:
+            print(fila)
+
+        for columna in range(1, len(tabla[0]), 1):
+            tabla[0][columna] = columnas[columna - 1]
+
+        for columna in range(1, len(tabla), 1):
+            tabla[columna][0] = filas[columna - 2]
+
+        print('--------------------------------------------------------------')
+
+        for produccion, terminos in self.getConjuntoP():
+            for t in terminos:
+                if t != "":
+                    for x in range(1, len(tabla)):
+                        if tabla[x][0] == produccion:
+                            if t in tabla[0]:
+                                tabla[x][tabla[0].index(t)] = produccion + ' --> ' + self.getTerminos(produccion)
+
+        for fila in tabla:
+            print(fila)
+
+        self._tabla = tabla
+
+    def getTerminos(self, no_terminal):
+        for nt, produccion in self.getP().items():
+            if no_terminal == nt:
+                return str(produccion)
