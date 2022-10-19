@@ -1,5 +1,6 @@
 from builtins import print
 from openpyxl import Workbook, load_workbook
+from openpyxl.styles import Font, Alignment
 
 
 class Gramatica:
@@ -64,8 +65,8 @@ class Gramatica:
         self._isLL1 = isLL1
 
     def eliminarRecursion(self):
-        # A+ BIA' | BA'|... | BA'
-        # A' → QA’ | Q2A' | ... | AmAla
+        # A+ BIA' | BA'|  | BA'
+        # A' → QA’ | Q2A' |   | AmAla
 
         terminos_independientes = []
         terminos_asociativos = []
@@ -124,8 +125,8 @@ class Gramatica:
 
     """
     Formula general
-    X→ y1,y2,y3.....yk
-    y1...→ VT 6 VN
+    X→ y1,y2,y3 ..yk
+    y1 → VT 6 VN
     prim(x) → si y1 es terminal, entonces agregar y1 a prim(x)
               si y1 no es terminal, entonces agregar prim(yl) a prim(x)
               si y1 es , entonces agregar prim(y2) a prim(x)
@@ -133,7 +134,7 @@ class Gramatica:
     """
 
     def generarPrimeros(self):
-        print("Generando primeros...")
+        print("Generando primeros ")
         primerosTotales = {}
         # Recorremos cada produccion
         print(self._P.items())
@@ -267,7 +268,7 @@ class Gramatica:
     """
 
     def generarSiguientes(self):
-        print("Generando siguientes...")
+        print("Generando siguientes ")
         print(self._P.items())
         llaves = list(self._P.keys())
         valores = list(self._P.values())
@@ -377,7 +378,7 @@ class Gramatica:
         """
 
     def conjuntoPrediccion(self):
-        print("Generando conjunto prediccion...")
+        print("Generando conjunto prediccion ")
         """Si todos dan 0 nos encontramos ante un conjunto de producciones que pertenecen a la gramatica LL1"""
         # Primero debemos tener los conjuntos de primeros y siguientes para aplicar la formular
         producciones = list(self.getP().keys())
@@ -424,10 +425,45 @@ class Gramatica:
         print('--------------------------------------------------------------')
 
     def guardarTabla(self):
-        print("Guardando tabla...")
+        print("Guardando tabla ...")
         wb = Workbook()
         ws = wb.active
+        ws.title = "TABLA ANALISIS SINTACTICO"
+        ws.append(['TABLA ANALISIS SINTACTICO'])
 
+        fuente = Font(name='Calibri',
+                      size=16,
+                      bold=False,
+                      italic=False,
+                      vertAlign=None,
+                      underline='none',
+                      strike=False,
+                      color='FF000000')
+        alignment = Alignment(horizontal='center',
+
+                              vertical='center',
+
+                              text_rotation=0,
+
+                              wrap_text=False,
+
+                              shrink_to_fit=False,
+
+                              indent=0)
+        for row in self.getTabla():
+            ws.append(row)
+
+        c = ws['A1:A8']
+        for a in c:
+            a[0].font = fuente
+            a[0].alignment = alignment
+        k = ws['B3:B8']
+        k = ws['B3:B8']
+        k = ws['B3:B8']
+        for a in k:
+            a[0].font = fuente
+            a[0].alignment = alignment
+        ws.rows
         wb.save('src/TABLA ANALISIS SINTACTICO.xlsx')
 
     """
@@ -441,7 +477,7 @@ class Gramatica:
     """
 
     def generarTabla(self):
-        print("Generando tabla...")
+        print("Generando tabla ")
         columnas = []  # terminales
         filas = []  # No terminales
 
