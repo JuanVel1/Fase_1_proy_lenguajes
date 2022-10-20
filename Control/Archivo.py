@@ -1,4 +1,6 @@
 import json
+import jpype
+
 from Entidad import Gramatica
 # CTRL + ALT + L --> FORMAT
 from builtins import print
@@ -58,3 +60,4 @@ class Archivo:
                 Producciones = aux
         grm = Gramatica.Gramatica(terminales, noTerminales, inicial, Producciones)
         return grm
+

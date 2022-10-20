@@ -1,4 +1,5 @@
 import Control.Archivo as A
+from Vista.Gui import Gui
 # CTRL + ALT + L --> FORMAT
 from builtins import print
 
@@ -38,3 +39,4 @@ if __name__ == '__main__':
     ## Paso 6, guardar tabla
     print("---------------------------------------------------------------------------------")
     gramatica.guardarTabla()
+    ventana = Gui(gramatica)
